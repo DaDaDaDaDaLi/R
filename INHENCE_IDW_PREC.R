@@ -2,22 +2,22 @@ Path="D:\\data_xijiang\\data_result\\forcing\\XJ_day_forcing_data\\prec"
 Filenames<-dir(Path)
 FilePath<-paste(Path,Filenames,sep = "\\")
 n1=length(FilePath)
-#n1ÊÇÎÄ¼þÊý
+#n1æ˜¯æ–‡ä»¶æ•°
 grid_point_lati<-read.table("D:\\data_xijiang\\data_long_lati.txt",header = F,sep = ",")[,5]
 grid_point_lati<-round(grid_point_lati,2)
 grid_point_long<-read.table("D:\\data_xijiang\\data_long_lati.txt",header = F,sep = ",")[,4]
 grid_point_long<-round(grid_point_long,2)
 grid_point<-data.frame(grid_point_lati,grid_point_long)
 n2<-nrow(grid_point)
-#n2ÊÇÁ÷ÓòÍø¸ñÊý4661
-grid_point<-as.matrix(grid_point)#ÒÔÉÏÊÇÍø¸ñµÄ¾­Î³¶È×ø±ê
+#n2æ˜¯æµåŸŸç½‘æ ¼æ•°4661
+grid_point<-as.matrix(grid_point)#ä»¥ä¸Šæ˜¯ç½‘æ ¼çš„ç»çº¬åº¦åæ ‡
 
 
 
 sample_point<-read.table("D:\\data_xijiang\\data_result\\forcing\\XJ_day_forcing_data\\prec\\day_prec_2010_1_1_.txt")[,c(2,3,7)]
 sample_point<-as.matrix(sample_point)
 n3<-nrow(sample_point)
-#n3ÊÇËùÑ¡ÔñµÄÁ÷ÓòË®ÎÄÕ¾µãµÄÊýÁ¿104
+#n3æ˜¯æ‰€é€‰æ‹©çš„æµåŸŸæ°´æ–‡ç«™ç‚¹çš„æ•°é‡104
 dis<-array(data=NA,c(4661,104))
 for(j in 1:n2){
   for(k in 1:n3){
@@ -25,7 +25,7 @@ for(j in 1:n2){
   }
 }
 dis<-round(dis,2)
-#¶ÔÓÚËùÓÐÑù±¾µãºÍ´ý²åÖµµãÀ´Ëµ£¬ËûÃÇµÄÏà¶Ô¾àÀëÊÇ²»±äµÄ,±äµÄÖ»ÊÇ´ý²åÖµµãµÄÖµ
+#å¯¹äºŽæ‰€æœ‰æ ·æœ¬ç‚¹å’Œå¾…æ’å€¼ç‚¹æ¥è¯´ï¼Œä»–ä»¬çš„ç›¸å¯¹è·ç¦»æ˜¯ä¸å˜çš„,å˜çš„åªæ˜¯å¾…æ’å€¼ç‚¹çš„å€¼
 
 for(i in 1:n1){
   V_S_code<-read.table(file=FilePath[i])[,1]
@@ -55,43 +55,57 @@ for(i in 1:n1){
   
   m_df<-as.matrix(df)
   V_grid=rep(0,4661)
-  for(l in 1:n2){
+    for(l in 1:n2){
     FM=0
-    #·ÖÄ¸
+    #åˆ†æ¯
     W=c()
-    #È¨ÖØ
+    #æƒé‡
     t1=c()
+    t3<-c()
+    t4<-c()
     n4=1
+    n6=1
     for(m in 1:n3){
       t1[n4]<-dis[l,m]
       n4=n4+1
     }
-    t1<-sort(t)
+    t3<-order(t1)
+    for(a in 1:5){
+      t4[n6]<-t3[a]
+      n6<-n6+1
+    }
+    t1<-sort(t1)
+    
     t2=c()
     n5=1
-    for(n in 1:10){
+    for(n in 1:5){
       t2[n5]<-t1[n]
       n5=n5+1
     }
-    for(m in 1:10){
-      FM=FM+(1/dis[l,m])^2
+    for(m in 1:5){
+      FM=FM+(1/t2[m])^2
     }
     
-    
-    for(m in 1:10){
-      W[m]=(1/dis[l,m])^2/FM
+    for(m in 1:5){
+      W[m]=(1/t2[m])^2/FM
     }
-    #ÒÔÉÏÏàµ±ÓÚ°ÑµÚl¸öµÄ´ý²åÖµµã¶ÔÓ¦µÄ¸÷¸öÑù±¾µãÈ¨ÖØ¼ÆËã³öÀ´ÁË
-    for(m in 1:10){
-      V_grid[l]=V_grid[l]+W[m]*m_df[m,5]
+    #ä»¥ä¸Šç›¸å½“äºŽæŠŠç¬¬lä¸ªçš„å¾…æ’å€¼ç‚¹å¯¹åº”çš„å„ä¸ªæ ·æœ¬ç‚¹æƒé‡è®¡ç®—å‡ºæ¥äº†
+    for(m in 1:5){
+      V_grid[l]=V_grid[l]+W[m]*m_df[t4[m],5]
     }
-    #°ÑµÚl¸ö´ý²åÖµµãµÄÖµ¼ÆËã³öÀ´
+    #æŠŠç¬¬lä¸ªå¾…æ’å€¼ç‚¹çš„å€¼è®¡ç®—å‡ºæ¥
   }
-  V_grid=round(V_grid,2)#ÔÚÕâÀï¿ÉÒÔÉèÖÃÒ»¸öÊý¾Ý¿òÈ»ºóÀûÓÃcbind()º¯Êý°Ñ¾­Î³¶È¼ÓÉÏ£¬¶ÔÓ¦µãµÄ¾­Î³¶ÈÒ»Ö±²»±ä
+  V_grid=round(V_grid,2)#åœ¨è¿™é‡Œå¯ä»¥è®¾ç½®ä¸€ä¸ªæ•°æ®æ¡†ç„¶åŽåˆ©ç”¨cbind()å‡½æ•°æŠŠç»çº¬åº¦åŠ ä¸Šï¼Œå¯¹åº”ç‚¹çš„ç»çº¬åº¦ä¸€ç›´ä¸å˜
+  for(i in 1:4661){
+    if(is.na(V_grid[i])==T){
+      V_grid[i]=V_grid[i+1]+V_grid[i-1]
+      V_grid[i]=V_grid[i]/2
+    }
+  }
   
-  write.table(V_grid,file=paste("D:\\data_xijiang\\data_result\\forcing\\improve_XJ_IDW_prec\\grid_prec",year[1],month[1],day[1],".txt",sep = "_"),col.names = F,row.names=F,quote = F)
+  write.table(V_grid,file=paste("D:\\data_xijiang\\F_F_1989\\forcing_1989\\3_win\\grid_win",year[1],month[1],day[1],".txt",sep = "_"),col.names = F,row.names=F,quote = F)
 }
-#Êä³ö²åÖµºóµÄÍø¸ñÖµÊ±×îºÃ°Ñ¶ÔÓ¦Íø¸ñ¾­Î³¶ÈÒ²¼ÓÉÏ£¬ÎÒÍü¼Ç¼ÓÁË£¬ºóÃæÔÚÖÆ×÷×îÖÕµÄÇý¶¯Êý¾ÝÊ±£¬ÎÄ¼þÃûÐèÒª¼ÓÉÏ¶ÔÓ¦Íø¸ñ¾­Î³¶È
+#è¾“å‡ºæ’å€¼åŽçš„ç½‘æ ¼å€¼æ—¶æœ€å¥½æŠŠå¯¹åº”ç½‘æ ¼ç»çº¬åº¦ä¹ŸåŠ ä¸Šï¼Œæˆ‘å¿˜è®°åŠ äº†ï¼ŒåŽé¢åœ¨åˆ¶ä½œæœ€ç»ˆçš„é©±åŠ¨æ•°æ®æ—¶ï¼Œæ–‡ä»¶åéœ€è¦åŠ ä¸Šå¯¹åº”ç½‘æ ¼ç»çº¬åº¦
 
 
 if(F){
